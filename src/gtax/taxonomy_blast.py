@@ -68,9 +68,9 @@ def taxonomy_blast():
     with open('{}_cont.tsv'.format(args.prefix), 'w') as f_cont:
         f_cont.write('transcript\tsubject\tevalue\ttax_id\ttaxa\n')
         with Pool(processes=int(args.threads)) as p:
-            results = p.map(partial(transcript_contamination,
-                                    blast_columns=args.blast_columns,
-                                    tax_ids=tax_ids, taxonomy=taxonomy),
+            results = p.imap(partial(transcript_contamination,
+                                     blast_columns=args.blast_columns,
+                                     tax_ids=tax_ids, taxonomy=taxonomy),
                             files)
             for data in results:
                 for r in data:
