@@ -1,5 +1,6 @@
 import os
 import gzip
+import loky
 import pandas
 import argparse
 from Bio import SeqIO
@@ -68,21 +69,24 @@ def taxonomy_blast():
     cont_ids = set()
     with open('{}_cont.tsv'.format(args.prefix), 'w') as f_cont:
         f_cont.write('transcript\tsubject\tevalue\ttax_id\ttaxa\n')
-        with Pool(processes=int(args.threads)) as p:
-            results = p.imap(partial(transcript_contamination,
-                                     blast_columns=args.blast_columns,
-                                     tax_ids=tax_ids, taxonomy=taxonomy),
-                            files)
-            ires = tqdm(results, total=len(files))
-            for idx, data in enumerate(ires):
-                if (idx % 10) == 0:
-                    ires.refresh()
 
-                for r in data:
-                    if r[1]:
-                        contamination += 1
-                        cont_ids.add(r[0])
-                        f_cont.write('{}\t{}\t{}\t{}\t{}\n'.format(r[0], r[4], r[3], r[5], r[2]))
+        executor = loky.get_reusable_executor(max_workers=int(args.threads))
+        results = executor.map(
+            partial(transcript_contamination,
+                    blast_columns=args.blast_columns,
+                    tax_ids=tax_ids, taxonomy=taxonomy),
+            files
+        )
+        results = tqdm(results, total=len(files))
+        for idx, data in enumerate(results):
+            if (idx % 10) == 0:
+                results.refresh()
+
+            for r in data:
+                if r[1]:
+                    contamination += 1
+                    cont_ids.add(r[0])
+                    f_cont.write('{}\t{}\t{}\t{}\t{}\n'.format(r[0], r[4], r[3], r[5], r[2]))
 
     with open('{}_clean.fsa'.format(args.prefix), 'w') as f_fsa:
         for r in records:

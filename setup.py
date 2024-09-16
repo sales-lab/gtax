@@ -31,6 +31,7 @@ setup(
     maintainer_email='veraalva' '@' 'ncbi.nlm.nih.gov',
     url='https://github.com/ncbi/gtax',
     install_requires=['biopython',
+                      'loky',
                       'networkx',
                       'numpy',
                       'pandas',
