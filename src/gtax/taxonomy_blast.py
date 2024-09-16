@@ -6,6 +6,7 @@ from Bio import SeqIO
 from multiprocessing import Pool
 from functools import partial
 from gtax.taxonomy import Taxonomy
+from tqdm import tqdm
 
 
 def transcript_contamination(filename, blast_columns, tax_ids, taxonomy):
@@ -72,7 +73,11 @@ def taxonomy_blast():
                                      blast_columns=args.blast_columns,
                                      tax_ids=tax_ids, taxonomy=taxonomy),
                             files)
-            for data in results:
+            ires = tqdm(results, total=len(files))
+            for idx, data in enumerate(ires):
+                if (idx % 10) == 0:
+                    ires.refresh()
+
                 for r in data:
                     if r[1]:
                         contamination += 1

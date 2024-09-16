@@ -34,7 +34,8 @@ setup(
                       'networkx',
                       'numpy',
                       'pandas',
-                      'requests'],
+                      'requests',
+                      'tqdm'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',
