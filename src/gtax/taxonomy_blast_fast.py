@@ -43,9 +43,7 @@ def taxonomy_blast_fast():
                         required=True)
     args = parser.parse_args()
 
-    taxonomy = Taxonomy()
-
-    tax_ids = [int(i) for i in taxonomy.successors(args.taxid)]
+    tax_ids = [int(i) for i in Taxonomy().successors(args.taxid)]
     print('{} taxonomies IDs in the list'.format(len(tax_ids)))
 
     records = {}
