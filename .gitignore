@@ -6,9 +6,7 @@
 
 # Project files
 /var/
-/.env
-venv/
-env/
+/.venv
 data/
 
 # Packaging
