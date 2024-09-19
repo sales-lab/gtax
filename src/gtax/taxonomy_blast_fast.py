@@ -32,7 +32,7 @@ def taxonomy_blast_fast():
                         required=True)
     parser.add_argument('--prefix', help='Prefix for output files',
                         required=True)
-    parser.add_argument('--fasta', help='Reference Transcriptome FASTA file',
+    parser.add_argument('--fastq', help='Reference Transcriptome FASTQ file',
                         required=True)
     parser.add_argument('--taxid', help='Parent TaxID to use as filter',
                         required=True)
@@ -47,8 +47,8 @@ def taxonomy_blast_fast():
     print('{} taxonomies IDs in the list'.format(len(tax_ids)))
 
     records = {}
-    with gzip.open(args.fasta, 'rt') as handle:
-        for record in SeqIO.parse(handle, "fasta"):
+    with gzip.open(args.fastq, 'rt') as handle:
+        for record in SeqIO.parse(handle, "fastq"):
             records[record.id] = record
     print(f"{len(records)} sequences loaded")
 
@@ -73,10 +73,10 @@ def taxonomy_blast_fast():
         contamination += len(data)
         cont_ids |= set(data)
 
-    with open('{}_clean.fsa'.format(args.prefix), 'w') as f_fsa:
+    with open('{}_clean.fastq'.format(args.prefix), 'w') as f_fsa:
         for r in records:
-            if r not in cont_ids:
-                f_fsa.write(records[r].format('fasta'))
+            if r.id not in cont_ids:
+                f_fsa.write(records[r].format('fastq'))
     print(f'Input Transcripts: {len(records)}\n'
           f'Clean Transcripts: {len(records) - contamination}\n'
           f'Contaminated transcripts: {contamination}')
