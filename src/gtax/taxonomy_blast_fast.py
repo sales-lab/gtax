@@ -46,12 +46,6 @@ def taxonomy_blast_fast():
     tax_ids = [int(i) for i in Taxonomy().successors(args.taxid)]
     print('{} taxonomies IDs in the list'.format(len(tax_ids)))
 
-    records = {}
-    with gzip.open(args.fastq, 'rt') as handle:
-        for record in SeqIO.parse(handle, "fastq"):
-            records[record.id] = record
-    print(f"{len(records)} sequences loaded")
-
     files = [os.path.join(args.blastdir, f)
              for f in os.listdir(args.blastdir) if f.endswith('.out.gz')]
 
@@ -73,10 +67,14 @@ def taxonomy_blast_fast():
         contamination += len(data)
         cont_ids |= set(data)
 
-    with open('{}_clean.fastq'.format(args.prefix), 'w') as f_fsa:
-        for r in records:
-            if r.id not in cont_ids:
-                f_fsa.write(records[r].format('fastq'))
-    print(f'Input Transcripts: {len(records)}\n'
-          f'Clean Transcripts: {len(records) - contamination}\n'
+    record_num = 0
+    with gzip.open(args.fastq, 'rt') as handle, \
+         open('{}_clean.fastq'.format(args.prefix), 'w') as f_fsa:
+        for record in SeqIO.parse(handle, "fastq"):
+            record_num += 1
+            if record.id not in cont_ids:
+                f_fsa.write(record.format('fastq'))
+
+    print(f'Input Transcripts: {record_num}\n'
+          f'Clean Transcripts: {record_num - contamination}\n'
           f'Contaminated transcripts: {contamination}')
