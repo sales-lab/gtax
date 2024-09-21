@@ -69,11 +69,12 @@ def taxonomy_blast_fast():
 
     record_num = 0
     with gzip.open(args.fastq, 'rt') as handle, \
-         open('{}_clean.fastq'.format(args.prefix), 'w') as f_fsa:
+         open(f"{args.prefix}_clean.fastq", "w") as clean, \
+         open(f"{args.prefix}_contam.fastq", "w") as contam:
         for record in SeqIO.parse(handle, "fastq"):
             record_num += 1
-            if record.id not in cont_ids:
-                f_fsa.write(record.format('fastq'))
+            dest = contam if record.id in cont_ids else clean
+            dest.write(record.format("fastq"))
 
     print(f'Input Transcripts: {record_num}\n'
           f'Clean Transcripts: {record_num - contamination}\n'
